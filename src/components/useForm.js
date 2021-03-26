@@ -31,9 +31,5 @@ export function useForm(initialFieldValues) {
 export function Form(props) {
   const classes = useStyles();
 
-  return (
-    <form className={classes.root} autoComplete='off'>
-      {props.children}
-    </form>
-  );
+  return <form className={classes.root}>{props.children}</form>;
 }

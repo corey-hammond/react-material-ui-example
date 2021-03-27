@@ -70,7 +70,10 @@ export default function EmployeeForm() {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validate()) window.alert('Success');
+    if (validate()) {
+      employeeService.insertEmployee(values);
+      resetForm();
+    }
   };
 
   return (

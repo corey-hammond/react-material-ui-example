@@ -22,10 +22,59 @@ const initialFieldValues = {
 };
 
 export default function EmployeeForm() {
-  const { values, setValues, handleInputChange } = useForm(initialFieldValues);
+  // Employee form validation
+  const validate = (fieldValues = values) => {
+    let temp = { ...errors };
+
+    if ('fullName' in fieldValues)
+      temp.fullName = fieldValues.fullName ? '' : 'Full name is required';
+
+    if ('email' in fieldValues)
+      temp.email =
+        /$^|.+@.+..+/.test(fieldValues.email) && fieldValues.email
+          ? ''
+          : 'Please enter a valid email address';
+
+    if ('phone' in fieldValues)
+      temp.phone =
+        fieldValues.phone.length > 8 && fieldValues.phone
+          ? ''
+          : 'A valid phone number is required';
+
+    if ('city' in fieldValues)
+      temp.city = fieldValues.city ? '' : 'City is required';
+
+    if ('departmentId' in fieldValues)
+      temp.departmentId =
+        fieldValues.departmentId.length !== 0 ? '' : 'Department is required';
+
+    setErrors({
+      ...temp,
+    });
+
+    if (fieldValues === values)
+      return Object.values(temp).every((x) => x === '');
+  };
+
+  // useForm Custom Hook
+  const {
+    values,
+    setValues,
+    errors,
+    setErrors,
+    handleInputChange,
+    resetForm,
+  } = useForm(initialFieldValues, true, validate);
+  console.log('useForm Running from EmployeeForm.js');
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validate()) window.alert('Success');
+  };
 
   return (
-    <Form>
+    <Form onSubmit={handleSubmit}>
       <Grid container>
         <Grid item xs={6}>
           <Controls.Input
@@ -33,24 +82,28 @@ export default function EmployeeForm() {
             label='Full Name'
             value={values.fullName}
             onChange={handleInputChange}
+            error={errors.fullName}
           />
           <Controls.Input
             name='email'
             label='Email'
             value={values.email}
             onChange={handleInputChange}
+            error={errors.email}
           />
           <Controls.Input
             name='phone'
             label='Phone Number'
             value={values.phone}
             onChange={handleInputChange}
+            error={errors.phone}
           />
           <Controls.Input
             name='city'
             label='City'
             value={values.city}
             onChange={handleInputChange}
+            error={errors.city}
           />
         </Grid>
         <Grid item xs={6}>
@@ -73,6 +126,7 @@ export default function EmployeeForm() {
             value={values.departmentId}
             onChange={handleInputChange}
             options={employeeService.getDepartmentCollection()}
+            error={errors.departmentId}
           />
           <Controls.DatePicker
             name='hireDate'
@@ -83,7 +137,7 @@ export default function EmployeeForm() {
 
           <div>
             <Controls.Button type='submit' text='Submit' />
-            <Controls.Button color='default' text='Reset' />
+            <Controls.Button color='default' text='Reset' onClick={resetForm} />
           </div>
         </Grid>
       </Grid>
